@@ -605,9 +605,10 @@ class ERP_PPROV_001(QMainWindow):
                             if contador==5:
                                 # respuesta['respuesta']=='incorrecto':
                                 mensajeDialogo("error", "Error", "Ingrese Datos Válidos")
+
                     else:
                         mensajeDialogo("error", "Error", "Faltan Datos")
-
+                        break
                 else:
                     if len(Tipo_Prov) and len(Pais) and len(Direcc_Prov) and len(Departamento) and (len(Telf_Fijo) or len(Telf_Cel))  and len(Correo_Emp) and len(Repre_Emp) and len(DNI_Repre) and len(Correo_Repre) and len(Telf_Cel_Repre)!=0:
                         sql ='''INSERT INTO TAB_PROV_001_Registro_de_Proveedores (Cod_prov,Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov,Usuario_Reg,Fecha_Reg,Hora_Reg)
@@ -653,12 +654,13 @@ class ERP_PPROV_001(QMainWindow):
                             self.pbDatos_Compra.setEnabled(True)
 
                             caso='Algo'
+                            contador+=1
+                            if contador==5:
+                                mensajeDialogo("error", "Error", "Ingrese Datos Válido")
 
-                        elif respuesta['respuesta']=='incorrecto':
-                            mensajeDialogo("error", "Error", "Ingrese Datos Válido")
                     else:
                         mensajeDialogo("error", "Error", "Faltan Datos")
-
+                        break
         except Exception as e:
             mensajeDialogo("error", "Error", "Campos vacios")
             print(e)
