@@ -204,26 +204,26 @@ def actualizar(tw,sql):
 def NombreUbigeo(CodPais,CodDepartamento,CodProvincia,CodDistrito,TablaUbigeo):
     NombreUBI={}
     try:
-        NombreUBI["Pais"]=TablaUbigeo[CodPais+"-0-0-0"]
+        NombreUBI["Pais"]=TablaUbigeo[CodPais+"-00-00-00"]
     except:
         NombreUBI["Pais"]=""
     if NombreUBI["Pais"]=="Peru":
         try:
-            if CodDepartamento!="0":
-                NombreUBI["Departamento"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-0-0"]
+            if CodDepartamento!="00":
+                NombreUBI["Departamento"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-00-00"]
             else:
                 NombreUBI["Departamento"]=""
         except:
             NombreUBI["Departamento"]=""
         try:
-            if CodProvincia!="0" and CodDepartamento!="0":
-                NombreUBI["Provincia"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-"+CodProvincia+"-0"]
+            if CodProvincia!="00" and CodDepartamento!="00":
+                NombreUBI["Provincia"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-"+CodProvincia+"-00"]
             else:
                 NombreUBI["Provincia"]=""
         except:
             NombreUBI["Provincia"]=""
         try:
-            if CodDistrito!="0" and CodProvincia!="0" and CodDepartamento!="0":
+            if CodDistrito!="00" and CodProvincia!="00" and CodDepartamento!="00":
                 NombreUBI["Distrito"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-"+CodProvincia+"-"+CodDistrito]
             else:
                 NombreUBI["Distrito"]=""
@@ -231,8 +231,8 @@ def NombreUbigeo(CodPais,CodDepartamento,CodProvincia,CodDistrito,TablaUbigeo):
             NombreUBI["Distrito"]=""
     else:
         try:
-            if CodDepartamento!="0":
-                NombreUBI["Departamento"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-0-0"]
+            if CodDepartamento!="00":
+                NombreUBI["Departamento"]=TablaUbigeo[CodPais+"-"+CodDepartamento+"-00-00"]
             else:
                 NombreUBI["Departamento"]=""
         except:

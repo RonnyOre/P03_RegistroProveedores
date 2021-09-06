@@ -51,6 +51,12 @@ class ERP_PPROV_001(QMainWindow):
         QMainWindow.__init__(self)
         uic.loadUi("ERP_PPROV_001.ui",self)
 
+        global Cod_Soc,Nom_Soc,Cod_Usuario
+
+        Cod_Soc='1000'
+        Nom_Soc='MULTICABLE PERU SOCIEDAD ANONIMA CERRADA'
+        Cod_Usuario='2021100004'
+
         self.leTelf_Fijo.setValidator(QIntValidator())
         self.leAnexo.setValidator(QIntValidator())
         self.leFax.setValidator(QIntValidator())
@@ -87,11 +93,11 @@ class ERP_PPROV_001(QMainWindow):
         self.pbBancos.setEnabled(False)
         self.pbDatos_Compra.setEnabled(False)
 
-    def datosGenerales(self, codSoc, empresa, usuario):
-        global Cod_Soc, Nom_Soc, Cod_Usuario
-        Cod_Soc = codSoc
-        Nom_Soc = empresa
-        Cod_Usuario = usuario
+    # def datosGenerales(self, codSoc, empresa, usuario):
+    #     global Cod_Soc, Nom_Soc, Cod_Usuario
+    #     Cod_Soc = codSoc
+    #     Nom_Soc = empresa
+    #     Cod_Usuario = usuario
 
         cargarLogo(self.lbLogo_Mp,'multiplay')
         cargarLogo(self.lbLogo_Soc, Cod_Soc)
@@ -337,7 +343,7 @@ class ERP_PPROV_001(QMainWindow):
 
     def leerDatos(self):
         global datos
-        sql="SELECT * FROM `TAB_SOC_009_Ubigeo` ORDER BY Cod_Distrito ASC, Cod_Provincia ASC, Cod_Depart_Region ASC, Cod_Pais ASC"
+        sql="SELECT * FROM `TAB_SOC_009_Ubigeo_NuevaVersion` ORDER BY Cod_Distrito ASC, Cod_Provincia ASC, Cod_Depart_Region ASC, Cod_Pais ASC"
         respuesta=consultarSql(sql)
         datos={}
         for dato in respuesta:
@@ -348,7 +354,7 @@ class ERP_PPROV_001(QMainWindow):
     def cargarPais(self):
         for k,v in datos.items():
             codigo=k.split("-")
-            if "-".join(codigo[1:])=="0-0-0":
+            if "-".join(codigo[1:])=="00-00-00":
                 self.cbPais.addItem(codigo[0]+" - "+v)
         self.cbPais.setCurrentIndex(-1)
         self.cbDep.setEnabled(False)
@@ -377,12 +383,12 @@ class ERP_PPROV_001(QMainWindow):
                 self.leDep.clear()
                 for k,v in datos.items():
                     codigoDep=k.split("-")
-                    if v==pais and "-".join(codigoDep[1:])=="0-0-0":
+                    if v==pais and "-".join(codigoDep[1:])=="00-00-00":
                         codigoPais=codigoDep[0]
                 for k,v in datos.items():
                     codigoDep=k.split("-")
-                    if "-".join(codigoDep[2:])=="0-0" and codigoPais==codigoDep[0]:
-                        if "-".join(codigoDep[1:])!="0-0-0":
+                    if "-".join(codigoDep[2:])=="00-00" and codigoPais==codigoDep[0]:
+                        if "-".join(codigoDep[1:])!="00-00-00":
                             self.cbDep.addItem(codigoDep[1]+" - "+v)
                 self.cbDep.setCurrentIndex(-1)
                 self.cbProvincia.clear()
@@ -423,19 +429,19 @@ class ERP_PPROV_001(QMainWindow):
                 codigoPais=""
                 for k,v in datos.items():
                     codigoProv=k.split("-")
-                    if v==pais and "-".join(codigoProv[1:])=="0-0-0": codigoPais=codigoProv[0]
-                    if v==departamento and "-".join(codigoProv[2:])=="0-0" and codigoPais==codigoProv[0]: codigoDep=codigoProv[0:2]
+                    if v==pais and "-".join(codigoProv[1:])=="00-00-00": codigoPais=codigoProv[0]
+                    if v==departamento and "-".join(codigoProv[2:])=="00-00" and codigoPais==codigoProv[0]: codigoDep=codigoProv[0:2]
                 for k,v in datos.items():
                     codigoProv=k.split("-")
-                    if codigoProv[3]=="0" and codigoDep==codigoProv[0:2] and codigoPais==codigoProv[0]:
-                        if "-".join(codigoProv[2:])!="0-0":
+                    if codigoProv[3]=="00" and codigoDep==codigoProv[0:2] and codigoPais==codigoProv[0]:
+                        if "-".join(codigoProv[2:])!="00-00":
                             self.cbProvincia.addItem(codigoProv[2]+" - "+v)
                 self.cbProvincia.setCurrentIndex(-1)
                 self.cbDistrito.clear()
                 self.cbDistrito.clearEditText()
                 self.leDistrito.clear()
                 self.leCod_Pos.clear()
-                if pais =="Peru":
+                if pais =="PERU":
                     self.cbProvincia.setEnabled(True)
             else:
                 mensajeDialogo("error", "Error", "Departamento no válido")
@@ -468,13 +474,13 @@ class ERP_PPROV_001(QMainWindow):
                 codigoPais=""
                 for k,v in datos.items():
                     codigoDist=k.split("-")
-                    if v==pais and "-".join(codigoDist[1:])=="0-0-0": codigoPais=codigoDist[0]
-                    if v==departamento and "-".join(codigoDist[2:])=="0-0" and codigoPais==codigoDist[0]: codigoDep=codigoDist[0:2]
-                    if v==provincia and "-".join(codigoDist[3])=="0" and codigoPais==codigoDist[0] and codigoDep==codigoDist[0:2]: codigoProv=codigoDist[0:3]
+                    if v==pais and "-".join(codigoDist[1:])=="00-00-00": codigoPais=codigoDist[0]
+                    if v==departamento and "-".join(codigoDist[2:])=="00-00" and codigoPais==codigoDist[0]: codigoDep=codigoDist[0:2]
+                    if v==provincia and "-".join(codigoDist[3:])=="00" and codigoPais==codigoDist[0] and codigoDep==codigoDist[0:2]: codigoProv=codigoDist[0:3]
                 for k,v in datos.items():
                     codigoDist=k.split("-")
-                    if codigoDist[3]!="0" and codigoProv==codigoDist[0:3] and codigoDep==codigoDist[0:2] and codigoPais==codigoDist[0]:
-                        if codigoDist[3]!="0":
+                    if codigoDist[3]!="00" and codigoProv==codigoDist[0:3] and codigoDep==codigoDist[0:2] and codigoPais==codigoDist[0]:
+                        if codigoDist[3]!="00":
                             self.cbDistrito.addItem(codigoDist[3]+" - "+v)
                 self.cbDistrito.setCurrentIndex(-1)
                 self.leCod_Pos.clear()
@@ -501,10 +507,10 @@ class ERP_PPROV_001(QMainWindow):
                 self.cbDistrito.setEditText(CodDist)
                 distrito=texto[texto.find("-")+2:]
                 self.leDistrito.setText(distrito)
-                sql="SELECT Cod_postal FROM TAB_SOC_009_Ubigeo WHERE Cod_Pais!='0' AND Cod_Depart_Region!='0' AND Cod_Provincia!='0' AND Cod_Distrito!='0' AND Nombre='%s'"%(distrito)
+                sql="SELECT Cod_postal FROM TAB_SOC_009_Ubigeo_NuevaVersion WHERE Cod_Pais!='00' AND Cod_Depart_Region!='00' AND Cod_Provincia!='00' AND Cod_Distrito!='00' AND Nombre='%s'"%(distrito)
                 lista=convlist(sql)
-
-                self.leCod_Pos.setText(lista[0])
+                if lista[0]!='0':
+                    self.leCod_Pos.setText(lista[0])
 
             else:
                 mensajeDialogo("error", "Error", "Distrito no válido")
