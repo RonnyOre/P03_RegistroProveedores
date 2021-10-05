@@ -21,25 +21,26 @@ class Buscar(QDialog):
 
         cargarIcono(self, 'erp')
 
-        sqlProv="SELECT Cod_prov,Tip_prov,Razón_social, Estado_Prov FROM TAB_PROV_001_Registro_de_Proveedores"
+        sqlProv="SELECT Cod_prov,Tip_prov,Razón_social, RUC_NIF, Estado_Prov FROM TAB_PROV_001_Registro_de_Proveedores"
         Prov=consultarSql(sqlProv)
 
         self.twProveedores.clear()
         for fila in Prov:
             if fila[1] in TipProv:
                 fila[1]=TipProv[fila[1]]
-            if fila[3]=='1':
-                fila[3]='ACTIVO'
+            if fila[4]=='1':
+                fila[4]='ACTIVO'
             else:
-                fila[3]='BAJA'
+                fila[4]='BAJA'
             item=QTreeWidgetItem(self.twProveedores,fila)
             self.twProveedores.addTopLevelItem(item)
         self.twProveedores.resizeColumnToContents(0)
         self.twProveedores.resizeColumnToContents(1)
         self.twProveedores.resizeColumnToContents(2)
+        self.twProveedores.resizeColumnToContents(3)
 
     def buscar(self):
-        buscarTabla(self.twProveedores, self.lePalabra.text(), [1,2])
+        buscarTabla(self.twProveedores, self.lePalabra.text(), [1,2,3])
 
     def Proveedor(self,item):
         global Codigo_Proveedor
