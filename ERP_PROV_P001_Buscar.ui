@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
+    <width>1079</width>
     <height>378</height>
    </rect>
   </property>
@@ -62,7 +62,7 @@
         <string/>
        </property>
        <property name="placeholderText">
-        <string>Tipo Proveedor / Razón Social</string>
+        <string>Tipo Proveedor / Razón Social / RUC</string>
        </property>
       </widget>
      </item>
@@ -121,6 +121,18 @@ QTreeWidget
        </column>
        <column>
         <property name="text">
+         <string>RUC</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>Estado</string>
         </property>
         <property name="font">
@@ -129,6 +141,9 @@ QTreeWidget
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
         </property>
        </column>
       </widget>

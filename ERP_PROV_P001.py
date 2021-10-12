@@ -33,6 +33,8 @@ class Buscar(QDialog):
             else:
                 fila[4]='BAJA'
             item=QTreeWidgetItem(self.twProveedores,fila)
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            item.setTextAlignment(4,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
             self.twProveedores.addTopLevelItem(item)
         self.twProveedores.resizeColumnToContents(0)
         self.twProveedores.resizeColumnToContents(1)
