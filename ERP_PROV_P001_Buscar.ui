@@ -94,6 +94,9 @@ QTreeWidget
           <bold>true</bold>
          </font>
         </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
        </column>
        <column>
         <property name="text">
@@ -129,6 +132,9 @@ QTreeWidget
           <weight>75</weight>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
         </property>
        </column>
        <column>

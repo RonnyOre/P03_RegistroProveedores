@@ -34,6 +34,8 @@ class Buscar(QDialog):
                 fila[4]='BAJA'
             item=QTreeWidgetItem(self.twProveedores,fila)
             item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            item.setTextAlignment(0,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+            item.setTextAlignment(3,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
             item.setTextAlignment(4,QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
             self.twProveedores.addTopLevelItem(item)
         self.twProveedores.resizeColumnToContents(0)
@@ -54,11 +56,11 @@ class ERP_PPROV_001(QMainWindow):
         QMainWindow.__init__(self)
         uic.loadUi("ERP_PPROV_001.ui",self)
 
-        global Cod_Soc,Nom_Soc,Cod_Usuario
-
-        Cod_Soc='1000'
-        Nom_Soc='MULTICABLE PERU SOCIEDAD ANONIMA CERRADA'
-        Cod_Usuario='2021100004'
+        # global Cod_Soc,Nom_Soc,Cod_Usuario
+        #
+        # Cod_Soc='1000'
+        # Nom_Soc='MULTICABLE PERU SOCIEDAD ANONIMA CERRADA'
+        # Cod_Usuario='2021100004'
 
         self.leTelf_Fijo.setValidator(QIntValidator())
         self.leAnexo.setValidator(QIntValidator())
@@ -91,16 +93,18 @@ class ERP_PPROV_001(QMainWindow):
         self.leCorreo_Emp.editingFinished.connect(self.validarCorreo)
         self.leCorreo_Repre.editingFinished.connect(self.validarCorreo)
         self.leDNI.editingFinished.connect(self.validarNumero)
+        self.leCod_Prov.returnPressed.connect(self.consultaProv)
 
         self.pbInterlocutores.setEnabled(False)
         self.pbBancos.setEnabled(False)
         self.pbDatos_Compra.setEnabled(False)
+        self.pbHabilitar.setEnabled(False)
 
-    # def datosGenerales(self, codSoc, empresa, usuario):
-    #     global Cod_Soc, Nom_Soc, Cod_Usuario
-    #     Cod_Soc = codSoc
-    #     Nom_Soc = empresa
-    #     Cod_Usuario = usuario
+    def datosGenerales(self, codSoc, empresa, usuario):
+        global Cod_Soc, Nom_Soc, Cod_Usuario
+        Cod_Soc = codSoc
+        Nom_Soc = empresa
+        Cod_Usuario = usuario
 
         cargarLogo(self.lbLogo_Mp,'multiplay')
         cargarLogo(self.lbLogo_Soc, Cod_Soc)
@@ -119,7 +123,7 @@ class ERP_PPROV_001(QMainWindow):
     def cargarCodProv(self):
         self.pbModificar.setEnabled(False)
         self.pbBaja.setEnabled(False)
-        self.leCod_Prov.setReadOnly(True)
+        # self.leCod_Prov.setReadOnly(True)
         self.leRazon_Social.setReadOnly(True)
         self.leDirecc_Prov.setReadOnly(True)
         self.leActivo_Baja.setReadOnly(True)
@@ -134,6 +138,13 @@ class ERP_PPROV_001(QMainWindow):
         for k,v in TipProv.items():
             self.cbTipo_Prov.addItem(v)
             self.cbTipo_Prov.setCurrentIndex(-1)
+
+    def consultaProv(self):
+        global Codigo_Proveedor
+        Codigo_Proveedor=self.leCod_Prov.text()
+        if len(Codigo_Proveedor)!=0:
+            self.Cargar_Proveedor()
+            self.leCod_Prov.setReadOnly(True)
 
     def Nuevo(self):
         global Codigo_Proveedor
@@ -168,6 +179,7 @@ class ERP_PPROV_001(QMainWindow):
         self.pbModificar.setEnabled(False)
         self.pbBaja.setEnabled(False)
         self.pbGrabar.setEnabled(True)
+        self.leCod_Prov.setReadOnly(False)
         self.cbTipo_Prov.setEnabled(True)
         self.leRUC.setReadOnly(False)
         self.cbPais.setEnabled(True)
@@ -193,6 +205,9 @@ class ERP_PPROV_001(QMainWindow):
         Codigo_Proveedor=None
 
         Buscar().exec_()
+        self.Cargar_Proveedor()
+
+    def Cargar_Proveedor(self):
         try:
             sqlCodProv="SELECT Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov FROM TAB_PROV_001_Registro_de_Proveedores WHERE Cod_prov='%s'"%(Codigo_Proveedor)
             lista=convlist(sqlCodProv)
@@ -220,6 +235,7 @@ class ERP_PPROV_001(QMainWindow):
                 self.pbBaja.setEnabled(False)
 
             self.leCod_Prov.setText(Codigo_Proveedor)
+            self.leCod_Prov.setReadOnly(True)
             self.leDirecc_Prov.setText(lista[4])
             self.leRazon_Social.setText(lista[0])
             self.cbPais.setEditText(lista[8])
@@ -299,6 +315,7 @@ class ERP_PPROV_001(QMainWindow):
 
         except Exception as e:
             if len(self.leCod_Prov.text())==0:
+                self.leCod_Prov.setReadOnly(False)
                 self.pbGrabar.setEnabled(True)
                 self.cbDep.setEnabled(False)
                 self.cbProvincia.setEnabled(False)
@@ -599,6 +616,7 @@ class ERP_PPROV_001(QMainWindow):
                             self.leTelf_Cel_Repre.setReadOnly(True)
 
                             self.pbGrabar.setEnabled(False)
+                            self.pbHabilitar.setEnabled(True)
                             self.pbInterlocutores.setEnabled(True)
                             self.pbBancos.setEnabled(True)
                             self.pbDatos_Compra.setEnabled(True)
@@ -652,6 +670,7 @@ class ERP_PPROV_001(QMainWindow):
                             self.leTelf_Cel_Repre.setReadOnly(True)
 
                             self.pbGrabar.setEnabled(False)
+                            self.pbHabilitar.setEnabled(True)
                             self.pbInterlocutores.setEnabled(True)
                             self.pbBancos.setEnabled(True)
                             self.pbDatos_Compra.setEnabled(True)
