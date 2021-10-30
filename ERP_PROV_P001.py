@@ -56,11 +56,11 @@ class ERP_PPROV_001(QMainWindow):
         QMainWindow.__init__(self)
         uic.loadUi("ERP_PPROV_001.ui",self)
 
-        # global Cod_Soc,Nom_Soc,Cod_Usuario
-        #
-        # Cod_Soc='1000'
-        # Nom_Soc='MULTICABLE PERU SOCIEDAD ANONIMA CERRADA'
-        # Cod_Usuario='2021100004'
+        global Cod_Soc,Nom_Soc,Cod_Usuario
+
+        Cod_Soc='1000'
+        Nom_Soc='MULTICABLE PERU SOCIEDAD ANONIMA CERRADA'
+        Cod_Usuario='2021100004'
 
         self.leTelf_Fijo.setValidator(QIntValidator())
         self.leAnexo.setValidator(QIntValidator())
@@ -100,11 +100,11 @@ class ERP_PPROV_001(QMainWindow):
         self.pbDatos_Compra.setEnabled(False)
         self.pbHabilitar.setEnabled(False)
 
-    def datosGenerales(self, codSoc, empresa, usuario):
-        global Cod_Soc, Nom_Soc, Cod_Usuario
-        Cod_Soc = codSoc
-        Nom_Soc = empresa
-        Cod_Usuario = usuario
+    # def datosGenerales(self, codSoc, empresa, usuario):
+    #     global Cod_Soc, Nom_Soc, Cod_Usuario
+    #     Cod_Soc = codSoc
+    #     Nom_Soc = empresa
+    #     Cod_Usuario = usuario
 
         cargarLogo(self.lbLogo_Mp,'multiplay')
         cargarLogo(self.lbLogo_Soc, Cod_Soc)
@@ -128,11 +128,7 @@ class ERP_PPROV_001(QMainWindow):
         self.leDirecc_Prov.setReadOnly(True)
         self.leActivo_Baja.setReadOnly(True)
         self.leEstado_Prov.setReadOnly(True)
-        self.lePais.setReadOnly(True)
-        self.leDep.setReadOnly(True)
-        self.leProvincia.setReadOnly(True)
-        self.leDistrito.setReadOnly(True)
-        self.leCod_Pos.setReadOnly(True)
+        self.leUbigeo.setReadOnly(True)
 
     def cargarTipoProv(self):
         for k,v in TipProv.items():
@@ -161,11 +157,7 @@ class ERP_PPROV_001(QMainWindow):
         self.cbDep.clearEditText()
         self.cbProvincia.clearEditText()
         self.cbDistrito.clearEditText()
-        self.lePais.clear()
-        self.leDep.clear()
-        self.leProvincia.clear()
-        self.leDistrito.clear()
-        self.leCod_Pos.clear()
+        self.leUbigeo.clear()
         self.leTelf_Fijo.clear()
         self.leAnexo.clear()
         self.leFax.clear()
@@ -251,15 +243,6 @@ class ERP_PPROV_001(QMainWindow):
 
             NombresLugar=NombreUbigeo(Paisx,Departamentox,Provinciax,Distritox,datos)
 
-            self.lePais.setText(NombresLugar["Pais"])
-            self.lePais.setReadOnly(True)
-            self.leDep.setText(NombresLugar["Departamento"])
-            self.leDep.setReadOnly(True)
-            self.leProvincia.setText(NombresLugar["Provincia"])
-            self.leProvincia.setReadOnly(True)
-            self.leDistrito.setText(NombresLugar["Distrito"])
-            self.leDistrito.setReadOnly(True)
-
             Pais= self.cbPais.currentText()
             if Pais=='1':
                 # sql="SELECT Cod_postal FROM TAB_SOC_009_Ubigeo WHERE Nombre='%s'"%(NombresLugar["Distrito"])
@@ -288,17 +271,13 @@ class ERP_PPROV_001(QMainWindow):
             self.leEstado_Prov.setReadOnly(True)
             self.cbPais.setEnabled(False)
             self.cbPais.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-            self.lePais.setReadOnly(True)
             self.cbDep.setEnabled(False)
             self.cbDep.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-            self.leDep.setReadOnly(True)
             self.cbProvincia.setEnabled(False)
             self.cbProvincia.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-            self.leProvincia.setReadOnly(True)
             self.cbDistrito.setEnabled(False)
             self.cbDistrito.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-            self.leDistrito.setReadOnly(True)
-            self.leCod_Pos.setReadOnly(True)
+            self.leUbigeo.setReadOnly(True)
             self.leTelf_Fijo.setReadOnly(True)
             self.leAnexo.setReadOnly(True)
             self.leFax.setReadOnly(True)
@@ -385,45 +364,37 @@ class ERP_PPROV_001(QMainWindow):
         self.cbDep.setEnabled(False)
         self.cbProvincia.setEnabled(False)
         self.cbDistrito.setEnabled(False)
-        texto=self.cbPais.currentText()
-        if len(texto)<=2:
-            mensajeDialogo("error", "Error", "Pais no válido")
-            self.lePais.clear()
-            self.cbPais.removeItem(0)
-            self.cbPais.setCurrentIndex(-1)
-        else:
-            if texto.find("-") != -1:
-                self.cbPais.setEditable(True)
-                Codpais=texto[0:texto.find("-")-1]
-                self.cbPais.setEditText(Codpais)
-                pais=texto[texto.find("-")+2:]
-                self.lePais.setText(pais)
-                if pais=="": return
-                self.cbDep.clear()
-                self.leDep.clear()
-                for k,v in datos.items():
-                    codigoDep=k.split("-")
-                    if v==pais and "-".join(codigoDep[1:])=="00-00-00":
-                        codigoPais=codigoDep[0]
-                for k,v in datos.items():
-                    codigoDep=k.split("-")
-                    if "-".join(codigoDep[2:])=="00-00" and codigoPais==codigoDep[0]:
-                        if "-".join(codigoDep[1:])!="00-00-00":
-                            self.cbDep.addItem(codigoDep[1]+" - "+v)
-                self.cbDep.setCurrentIndex(-1)
-                self.cbProvincia.clear()
-                self.cbProvincia.clearEditText()
-                self.leProvincia.clear()
-                self.cbDistrito.clear()
-                self.cbDistrito.clearEditText()
-                self.leDistrito.clear()
-                self.leCod_Pos.clear()
-                self.cbDep.setEnabled(True)
-            else:
-                mensajeDialogo("error", "Error", "Pais no válido")
-                self.lePais.clear()
-                self.cbPais.removeItem(0)
-                self.cbPais.setCurrentIndex(-1)
+        # texto=self.cbPais.currentText()
+        # if len(texto)<=2:
+        #     mensajeDialogo("error", "Error", "Pais no válido")
+        #     self.lePais.clear()
+        #     self.cbPais.removeItem(0)
+        #     self.cbPais.setCurrentIndex(-1)
+
+
+        # Codpais=texto[0:texto.find("-")-1]
+        # self.cbPais.setEditText(Codpais)
+        # texto[texto.find("-")+2:]
+        pais=self.cbPais.currentText()
+        if pais=="": return
+        self.cbDep.clear()
+        for k,v in datos.items():
+            codigoDep=k.split("-")
+            print(codigoDep)
+            if v==pais and "-".join(codigoDep[1:])=="00-00-00":
+                codigoPais=codigoDep[0]
+        for k,v in datos.items():
+            codigoDep=k.split("-")
+            if "-".join(codigoDep[2:])=="00-00" and codigoPais==codigoDep[0]:
+                if "-".join(codigoDep[1:])!="00-00-00":
+                    self.cbDep.addItem(codigoDep[1]+" - "+v)
+        self.cbDep.setCurrentIndex(-1)
+        self.cbProvincia.clear()
+        self.cbProvincia.clearEditText()
+        self.cbDistrito.clear()
+        self.cbDistrito.clearEditText()
+        self.leUbigeo.clear()
+        self.cbDep.setEnabled(True)
 
     def cargarProvincia(self):
         self.cbProvincia.setEnabled(False)
@@ -595,17 +566,17 @@ class ERP_PPROV_001(QMainWindow):
                             self.leRUC.setReadOnly(True)
                             self.cbPais.setEnabled(False)
                             self.cbPais.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.lePais.setReadOnly(True)
+
                             self.cbDep.setEnabled(False)
                             self.cbDep.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.leDep.setReadOnly(True)
+
                             self.cbProvincia.setEnabled(False)
                             self.cbProvincia.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.leProvincia.setReadOnly(True)
+
                             self.cbDistrito.setEnabled(False)
                             self.cbDistrito.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.leDistrito.setReadOnly(True)
-                            self.leCod_Pos.setReadOnly(True)
+
+                            self.leUbigeo.setReadOnly(True)
                             self.leTelf_Fijo.setReadOnly(True)
                             self.leAnexo.setReadOnly(True)
                             self.leFax.setReadOnly(True)
@@ -649,17 +620,17 @@ class ERP_PPROV_001(QMainWindow):
                             self.leRUC.setReadOnly(True)
                             self.cbPais.setEnabled(False)
                             self.cbPais.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.lePais.setReadOnly(True)
+
                             self.cbDep.setEnabled(False)
                             self.cbDep.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.leDep.setReadOnly(True)
+
                             self.cbProvincia.setEnabled(False)
                             self.cbProvincia.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.leProvincia.setReadOnly(True)
+
                             self.cbDistrito.setEnabled(False)
                             self.cbDistrito.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
-                            self.leDistrito.setReadOnly(True)
-                            self.leCod_Pos.setReadOnly(True)
+
+                            self.leUbigeo.setReadOnly(True)
                             self.leTelf_Fijo.setReadOnly(True)
                             self.leAnexo.setReadOnly(True)
                             self.leFax.setReadOnly(True)

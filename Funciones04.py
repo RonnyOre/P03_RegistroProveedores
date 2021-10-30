@@ -651,7 +651,7 @@ def llenarPais(TablaUbigeo,cbPais):  #Codigo pais va 0
         au=ubigeo.find("-")
         bu=ubigeo.find("-",au+1)
         cu=ubigeo.find("-",bu+1)
-        if ubigeo[au+1:]=="0-0-0":
+        if ubigeo[au+1:]=="00-00-00":
             cbPais.addItem(nombre)
 
 def llenarDepartamento(TablaUbigeo,cbDepartamento,codigoPais):  #Codigo pais va 0
@@ -659,7 +659,7 @@ def llenarDepartamento(TablaUbigeo,cbDepartamento,codigoPais):  #Codigo pais va 
         au=ubigeo.find("-")
         bu=ubigeo.find("-",au+1)
         cu=ubigeo.find("-",bu+1)
-        if ubigeo[:au]==codigoPais and ubigeo[au+1:]!="0-0-0" and ubigeo[bu+1:]=="0-0":
+        if ubigeo[:au]==codigoPais and ubigeo[au+1:]!="00-00-00" and ubigeo[bu+1:]=="00-00":
             cbDepartamento.addItem(nombre)
 
 def llenarDep(TablaUbigeo,cbDepartamento,codigoPais):  #Codigo pais va 0
@@ -668,7 +668,7 @@ def llenarDep(TablaUbigeo,cbDepartamento,codigoPais):  #Codigo pais va 0
         au=ubigeo.find("-")
         bu=ubigeo.find("-",au+1)
         cu=ubigeo.find("-",bu+1)
-        if ubigeo[:au]==codigoPais and ubigeo[au+1:]!="0-0-0" and ubigeo[bu+1:]=="0-0":
+        if ubigeo[:au]==codigoPais and ubigeo[au+1:]!="00-00-00" and ubigeo[bu+1:]=="00-00":
             cbDepartamento.addItem(ubigeo[au+1:bu]+" - "+nombre)
             cbDepartamento.setCurrentIndex(-1)
 

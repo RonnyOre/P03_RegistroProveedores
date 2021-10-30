@@ -769,18 +769,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lePais">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(255, 255, 255);</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -839,18 +827,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leDep">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(255, 255, 255);</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_5">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -905,18 +881,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
           </property>
           <property name="sizeAdjustPolicy">
            <enum>QComboBox::AdjustToContents</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="leProvincia">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(255, 255, 255);</string>
           </property>
          </widget>
         </item>
@@ -983,27 +947,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leDistrito">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(255, 255, 255);</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -1029,12 +972,12 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
            <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
           </property>
           <property name="text">
-           <string>Código Postal</string>
+           <string>Ubigeo</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="leCod_Pos">
+         <widget class="QLineEdit" name="leUbigeo">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -1823,14 +1766,10 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
   <tabstop>pbBancos</tabstop>
   <tabstop>pbDatos_Compra</tabstop>
   <tabstop>cbPais</tabstop>
-  <tabstop>lePais</tabstop>
   <tabstop>cbDep</tabstop>
-  <tabstop>leDep</tabstop>
   <tabstop>cbProvincia</tabstop>
-  <tabstop>leProvincia</tabstop>
   <tabstop>cbDistrito</tabstop>
-  <tabstop>leDistrito</tabstop>
-  <tabstop>leCod_Pos</tabstop>
+  <tabstop>leUbigeo</tabstop>
   <tabstop>leTelf_Fijo</tabstop>
   <tabstop>leAnexo</tabstop>
   <tabstop>leFax</tabstop>
