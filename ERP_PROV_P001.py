@@ -87,7 +87,7 @@ class ERP_PPROV_001(QMainWindow):
         self.cbPais.activated.connect(self.cargarDepartamento)
         self.cbDep.activated.connect(self.cargarProvincia)
         self.cbProvincia.activated.connect(self.cargarDistrito)
-        self.cbDistrito.activated.connect(self.cargar)
+        self.cbDistrito.activated.connect(self.ubigeo)
         self.leRUC.returnPressed.connect(self.consultaRUC)
 
         self.leCorreo_Emp.editingFinished.connect(self.validarCorreo)
@@ -201,25 +201,34 @@ class ERP_PPROV_001(QMainWindow):
 
     def Cargar_Proveedor(self):
         try:
-            sqlCodProv="SELECT Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov FROM TAB_PROV_001_Registro_de_Proveedores WHERE Cod_prov='%s'"%(Codigo_Proveedor)
+            # sqlCodProv="SELECT Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,País,Departamento,Provincia,Distrito,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov FROM TAB_PROV_001_Registro_de_Proveedores WHERE Cod_prov='%s';"%(Codigo_Proveedor)
+            sqlCodProv='''SELECT a.Razón_social,a.Tip_Prov,a.Nro_Telf,a.Correo,a.Direcc_prov,CONCAT(a.País,' - ',b.Nombre),CONCAT(a.Departamento,' - ',c.Nombre),CONCAT(a.Provincia,' - ',d.Nombre),CONCAT(a.Distrito,' - ', e.Nombre),a.Ubigeo,a.Nro_Telf_Emp,a.Nro_Fax,a.Anexo,a.RUC_NIF,a.Representante,a.DNI_Repre,a.Correo_Repre,a.Telf_Repre,a.Estado_Prov
+            FROM TAB_PROV_001_Registro_de_Proveedores a
+            LEFT JOIN TAB_SOC_009_Ubigeo_NuevaVersion b ON b.Cod_Pais=a.País AND b.Cod_Depart_Region='00' AND b.Cod_Provincia='00' AND b.Cod_Distrito='00'
+            LEFT JOIN TAB_SOC_009_Ubigeo_NuevaVersion c ON c.Cod_Pais=a.País AND c.Cod_Depart_Region=a.Departamento AND c.Cod_Provincia='00' AND c.Cod_Distrito='00'
+            LEFT JOIN TAB_SOC_009_Ubigeo_NuevaVersion d ON d.Cod_Pais=a.País AND d.Cod_Depart_Region=a.Departamento AND d.Cod_Provincia=a.Provincia AND d.Cod_Distrito='00'
+            LEFT JOIN TAB_SOC_009_Ubigeo_NuevaVersion e ON e.Cod_Pais=a.País AND e.Cod_Depart_Region=a.Departamento AND e.Cod_Provincia=a.Provincia AND e.Cod_Distrito=a.Distrito
+            WHERE a.Cod_prov='%s';'''%(Codigo_Proveedor)
+
             lista=convlist(sqlCodProv)
+            print(lista)
             for i in range(len(lista)):
                 if lista[i]=='0':
                     lista[i]=""
 
             self.pbGrabar.setEnabled(False)
             self.cbTipo_Prov.setCurrentIndex(int(lista[1])-1)
-            self.leRUC.setText(lista[12])
-            self.leEstado_Prov.setText(lista[17])
+            self.leRUC.setText(lista[13])
+            self.leEstado_Prov.setText(lista[18])
 
-            if lista[17]=="1":
+            if lista[18]=="1":
                 self.leActivo_Baja.setText("ACTIVO")
                 self.leActivo_Baja.setStyleSheet("")
                 self.leActivo_Baja.setStyleSheet("background-color: rgb(255,255,255);")
                 self.pbHabilitar.setEnabled(True)
                 self.pbBaja.setEnabled(True)
 
-            elif lista[17]=="2":
+            elif lista[18]=="2":
                 self.leActivo_Baja.setText("BAJA")
                 self.leActivo_Baja.setStyleSheet("color: rgb(255,0,0);\n""background-color: rgb(255,255,255);")
                 self.pbHabilitar.setEnabled(False)
@@ -230,40 +239,32 @@ class ERP_PPROV_001(QMainWindow):
             self.leCod_Prov.setReadOnly(True)
             self.leDirecc_Prov.setText(lista[4])
             self.leRazon_Social.setText(lista[0])
-            self.cbPais.setEditText(lista[8])
+
+            self.cbPais.setCurrentIndex(self.cbPais.findText(lista[5]))
             self.cbPais.setEnabled(False)
-            self.cbDep.setEditText(lista[5])
-            self.cbProvincia.setEditText(lista[6])
-            self.cbDistrito.setEditText(lista[7])
+            self.cargarDepartamento()
+            self.cbDep.setCurrentIndex(self.cbDep.findText(lista[6]))
+            self.cargarProvincia()
+            self.cbProvincia.setCurrentIndex(self.cbProvincia.findText(lista[7]))
+            self.cargarDistrito()
+            self.cbDistrito.setCurrentIndex(self.cbDistrito.findText(lista[8]))
 
-            Paisx=lista[8]
-            Departamentox=lista[5]
-            Provinciax=lista[6]
-            Distritox=lista[7]
-
-            NombresLugar=NombreUbigeo(Paisx,Departamentox,Provinciax,Distritox,datos)
-
-            Pais= self.cbPais.currentText()
-            if Pais=='1':
-                # sql="SELECT Cod_postal FROM TAB_SOC_009_Ubigeo WHERE Nombre='%s'"%(NombresLugar["Distrito"])
-                sql="SELECT Cod_postal FROM TAB_SOC_009_Ubigeo WHERE Cod_Pais='%s' and Cod_Depart_Region='%s' and Cod_Provincia='%s' and Cod_Distrito='%s'"%(Paisx,Departamentox,Provinciax,Distritox)
-                Cod_postal=convlist(sql)
-                if Cod_postal[0]=='0':
-                    self.leCod_Pos.setText("")
-                else:
-                    self.leCod_Pos.setText(Cod_postal[0])
+            cbPais=self.cbPais.currentText()
+            Pais=cbPais[0:cbPais.find("-")-1]
+            if Pais=='01':
+                self.leUbigeo.setText(lista[9])
             else:
-                self.leCod_Pos.setText("")
+                self.leUbigeo.setText("")
 
             self.leTelf_Fijo.setText(lista[2])
-            self.leAnexo.setText(lista[11])
-            self.leFax.setText(lista[10])
-            self.leTelf_Cel.setText(lista[9])
+            self.leAnexo.setText(lista[12])
+            self.leFax.setText(lista[11])
+            self.leTelf_Cel.setText(lista[10])
             self.leCorreo_Emp.setText(lista[3])
-            self.leRepre_Emp.setText(lista[13])
-            self.leDNI.setText(lista[14])
-            self.leCorreo_Repre.setText(lista[15])
-            self.leTelf_Cel_Repre.setText(lista[16])
+            self.leRepre_Emp.setText(lista[14])
+            self.leDNI.setText(lista[15])
+            self.leCorreo_Repre.setText(lista[16])
+            self.leTelf_Cel_Repre.setText(lista[17])
 
             self.cbTipo_Prov.setEnabled(False)
             self.cbTipo_Prov.setStyleSheet("color: rgb(0,0,0);\n""background-color: rgb(255,255,255);")
@@ -347,14 +348,12 @@ class ERP_PPROV_001(QMainWindow):
         datos={}
         for dato in respuesta:
             codigo="-".join(dato[0:4])
-            if codigo not in datos:
-                datos[codigo]=dato[4]
+            if codigo not in datos: datos[codigo]=dato[4]
 
     def cargarPais(self):
         for k,v in datos.items():
             codigo=k.split("-")
-            if "-".join(codigo[1:])=="00-00-00":
-                self.cbPais.addItem(codigo[0]+" - "+v)
+            if "-".join(codigo[1:])=="00-00-00": self.cbPais.addItem(codigo[0]+" - "+v)
         self.cbPais.setCurrentIndex(-1)
         self.cbDep.setEnabled(False)
         self.cbProvincia.setEnabled(False)
@@ -364,30 +363,19 @@ class ERP_PPROV_001(QMainWindow):
         self.cbDep.setEnabled(False)
         self.cbProvincia.setEnabled(False)
         self.cbDistrito.setEnabled(False)
-        # texto=self.cbPais.currentText()
-        # if len(texto)<=2:
-        #     mensajeDialogo("error", "Error", "Pais no válido")
-        #     self.lePais.clear()
-        #     self.cbPais.removeItem(0)
-        #     self.cbPais.setCurrentIndex(-1)
 
+        texto=self.cbPais.currentText()
+        pais=texto[texto.find("-")+2:]
 
-        # Codpais=texto[0:texto.find("-")-1]
-        # self.cbPais.setEditText(Codpais)
-        # texto[texto.find("-")+2:]
-        pais=self.cbPais.currentText()
         if pais=="": return
         self.cbDep.clear()
         for k,v in datos.items():
             codigoDep=k.split("-")
-            print(codigoDep)
-            if v==pais and "-".join(codigoDep[1:])=="00-00-00":
-                codigoPais=codigoDep[0]
+            if v==pais and "-".join(codigoDep[1:])=="00-00-00": codigoPais=codigoDep[0]
         for k,v in datos.items():
             codigoDep=k.split("-")
             if "-".join(codigoDep[2:])=="00-00" and codigoPais==codigoDep[0]:
-                if "-".join(codigoDep[1:])!="00-00-00":
-                    self.cbDep.addItem(codigoDep[1]+" - "+v)
+                if "-".join(codigoDep[1:])!="00-00-00": self.cbDep.addItem(codigoDep[1]+" - "+v)
         self.cbDep.setCurrentIndex(-1)
         self.cbProvincia.clear()
         self.cbProvincia.clearEditText()
@@ -399,116 +387,76 @@ class ERP_PPROV_001(QMainWindow):
     def cargarProvincia(self):
         self.cbProvincia.setEnabled(False)
         self.cbDistrito.setEnabled(False)
-        texto=self.cbDep.currentText()
-        if len(texto)<=2:
-            mensajeDialogo("error", "Error", "Departamento no válido")
-            self.leDep.clear()
-            self.cbDep.removeItem(0)
-            self.cbDep.setCurrentIndex(-1)
-        else:
-            if texto.find("-") != -1:
-                self.cbDep.setEditable(True)
-                CodDep=texto[0:texto.find("-")-1]
-                self.cbDep.setEditText(CodDep)
-                departamento=texto[texto.find("-")+2:]
-                self.leDep.setText(departamento)
 
-                if departamento=="": return
-                pais=self.lePais.text()
-                self.cbProvincia.clear()
-                self.leProvincia.clear()
-                codigoPais=""
-                for k,v in datos.items():
-                    codigoProv=k.split("-")
-                    if v==pais and "-".join(codigoProv[1:])=="00-00-00": codigoPais=codigoProv[0]
-                    if v==departamento and "-".join(codigoProv[2:])=="00-00" and codigoPais==codigoProv[0]: codigoDep=codigoProv[0:2]
-                for k,v in datos.items():
-                    codigoProv=k.split("-")
-                    if codigoProv[3]=="00" and codigoDep==codigoProv[0:2] and codigoPais==codigoProv[0]:
-                        if "-".join(codigoProv[2:])!="00-00":
-                            self.cbProvincia.addItem(codigoProv[2]+" - "+v)
-                self.cbProvincia.setCurrentIndex(-1)
-                self.cbDistrito.clear()
-                self.cbDistrito.clearEditText()
-                self.leDistrito.clear()
-                self.leCod_Pos.clear()
-                if pais =="PERU":
-                    self.cbProvincia.setEnabled(True)
-            else:
-                mensajeDialogo("error", "Error", "Departamento no válido")
-                self.leDep.clear()
-                self.cbDep.removeItem(0)
-                self.cbDep.setCurrentIndex(-1)
+        texto=self.cbDep.currentText()
+        departamento=texto[texto.find("-")+2:]
+
+        if departamento=="": return
+        cbPais=self.cbPais.currentText()
+        pais=cbPais[cbPais.find("-")+2:]
+        self.cbProvincia.clear()
+        codigoPais=""
+        for k,v in datos.items():
+            codigoProv=k.split("-")
+            if v==pais and "-".join(codigoProv[1:])=="00-00-00": codigoPais=codigoProv[0]
+            if v==departamento and "-".join(codigoProv[2:])=="00-00" and codigoPais==codigoProv[0]: codigoDep=codigoProv[0:2]
+        for k,v in datos.items():
+            codigoProv=k.split("-")
+            if codigoProv[3]=="00" and codigoDep==codigoProv[0:2] and codigoPais==codigoProv[0]:
+                if "-".join(codigoProv[2:])!="00-00": self.cbProvincia.addItem(codigoProv[2]+" - "+v)
+        self.cbProvincia.setCurrentIndex(-1)
+        self.cbDistrito.clear()
+        self.cbDistrito.clearEditText()
+        self.leUbigeo.clear()
+
+        if pais =="PERU": self.cbProvincia.setEnabled(True)
 
     def cargarDistrito(self):
         self.cbDistrito.setEnabled(False)
+
         texto=self.cbProvincia.currentText()
-        if len(texto)<=2:
-            mensajeDialogo("error", "Error", "Provincia no válida")
-            self.leProvincia.clear()
-            self.cbProvincia.removeItem(0)
-            self.cbProvincia.setCurrentIndex(-1)
-        else:
-            if texto.find("-") != -1:
-                self.cbProvincia.setEditable(True)
-                CodProv=texto[0:texto.find("-")-1]
-                self.cbProvincia.setEditText(CodProv)
-                provincia=texto[texto.find("-")+2:]
-                self.leProvincia.setText(provincia)
+        provincia=texto[texto.find("-")+2:]
 
-                if provincia=="": return
-                departamento=self.leDep.text()
-                pais=self.lePais.text()
-                self.cbDistrito.clear()
-                self.leDistrito.clear()
-                codigoDep=""
-                codigoPais=""
-                for k,v in datos.items():
-                    codigoDist=k.split("-")
-                    if v==pais and "-".join(codigoDist[1:])=="00-00-00": codigoPais=codigoDist[0]
-                    if v==departamento and "-".join(codigoDist[2:])=="00-00" and codigoPais==codigoDist[0]: codigoDep=codigoDist[0:2]
-                    if v==provincia and "-".join(codigoDist[3:])=="00" and codigoPais==codigoDist[0] and codigoDep==codigoDist[0:2]: codigoProv=codigoDist[0:3]
-                for k,v in datos.items():
-                    codigoDist=k.split("-")
-                    if codigoDist[3]!="00" and codigoProv==codigoDist[0:3] and codigoDep==codigoDist[0:2] and codigoPais==codigoDist[0]:
-                        if codigoDist[3]!="00":
-                            self.cbDistrito.addItem(codigoDist[3]+" - "+v)
-                self.cbDistrito.setCurrentIndex(-1)
-                self.leCod_Pos.clear()
-                self.cbDistrito.setEnabled(True)
-            else:
-                mensajeDialogo("error", "Error", "Provincia no válida")
-                self.leProvincia.clear()
-                self.cbProvincia.removeItem(0)
-                self.cbProvincia.setCurrentIndex(-1)
+        if provincia=="": return
 
-    def cargar(self):
-        texto=self.cbDistrito.currentText()
-        if len(texto)<=2:
-            mensajeDialogo("error", "Error", "Distrito no válido")
-            self.leDistrito.clear()
-            self.cbDistrito.removeItem(0)
-            self.leCod_Pos.clear()
-            self.cbDistrito.setCurrentIndex(-1)
-        else:
-            if texto.find("-") != -1:
-                self.leCod_Pos.clear()
-                self.cbDistrito.setEditable(True)
-                CodDist=texto[0:texto.find("-")-1]
-                self.cbDistrito.setEditText(CodDist)
-                distrito=texto[texto.find("-")+2:]
-                self.leDistrito.setText(distrito)
-                sql="SELECT Cod_postal FROM TAB_SOC_009_Ubigeo_NuevaVersion WHERE Cod_Pais!='00' AND Cod_Depart_Region!='00' AND Cod_Provincia!='00' AND Cod_Distrito!='00' AND Nombre='%s'"%(distrito)
-                lista=convlist(sql)
-                if lista[0]!='0':
-                    self.leCod_Pos.setText(lista[0])
+        cbDep=self.cbDep.currentText()
+        departamento=cbDep[cbDep.find("-")+2:]
 
-            else:
-                mensajeDialogo("error", "Error", "Distrito no válido")
-                self.leDistrito.clear()
-                self.cbDistrito.removeItem(0)
-                self.leCod_Pos.clear()
-                self.cbDistrito.setCurrentIndex(-1)
+        cbPais=self.cbPais.currentText()
+        pais=cbPais[cbPais.find("-")+2:]
+
+        self.cbDistrito.clear()
+
+        codigoDep=""
+        codigoPais=""
+        for k,v in datos.items():
+            codigoDist=k.split("-")
+            if v==pais and "-".join(codigoDist[1:])=="00-00-00": codigoPais=codigoDist[0]
+            if v==departamento and "-".join(codigoDist[2:])=="00-00" and codigoPais==codigoDist[0]: codigoDep=codigoDist[0:2]
+            if v==provincia and "-".join(codigoDist[3:])=="00" and codigoPais==codigoDist[0] and codigoDep==codigoDist[0:2]: codigoProv=codigoDist[0:3]
+        for k,v in datos.items():
+            codigoDist=k.split("-")
+            if codigoDist[3]!="00" and codigoProv==codigoDist[0:3] and codigoDep==codigoDist[0:2] and codigoPais==codigoDist[0]:
+                if codigoDist[3]!="00": self.cbDistrito.addItem(codigoDist[3]+" - "+v)
+        self.cbDistrito.setCurrentIndex(-1)
+        self.leUbigeo.clear()
+        self.cbDistrito.setEnabled(True)
+
+    def ubigeo(self):
+
+        cbDistrito=self.cbDistrito.currentText()
+        CodDistrito=cbDistrito[0:cbDistrito.find("-")-1]
+
+        cbProvincia=self.cbProvincia.currentText()
+        CodProvincia=cbProvincia[0:cbProvincia.find("-")-1]
+
+        cbDep=self.cbDep.currentText()
+        CodDepartamento=cbDep[0:cbDep.find("-")-1]
+
+        Ubigeo=CodDepartamento+CodProvincia+CodDistrito
+
+        if len(Ubigeo)!=0:
+            self.leUbigeo.setText(Ubigeo)
 
     def Grabar(self):
         try:
@@ -524,11 +472,21 @@ class ERP_PPROV_001(QMainWindow):
                 Estado_Prov=self.leEstado_Prov.text()
                 Direcc_Prov=self.leDirecc_Prov.text()
                 Razon_Social=self.leRazon_Social.text()
-                Pais=self.cbPais.currentText()
-                Departamento=self.cbDep.currentText()
-                Provincia=self.cbProvincia.currentText()
-                Distrito=self.cbDistrito.currentText()
-                Cod_Pos=self.leCod_Pos.text()
+
+                cbPais=self.cbPais.currentText()
+                Pais=cbPais[0:cbPais.find("-")-1]
+
+                cbDep=self.cbDep.currentText()
+                Departamento=cbDep[0:cbDep.find("-")-1]
+
+                cbProvincia=self.cbProvincia.currentText()
+                Provincia=cbProvincia[0:cbProvincia.find("-")-1]
+
+                cbDistrito=self.cbDistrito.currentText()
+                Distrito=cbDistrito[0:cbDistrito.find("-")-1]
+
+                Ubigeo=self.leUbigeo.text()
+
                 Telf_Fijo=self.leTelf_Fijo.text()
                 Anexo=self.leAnexo.text()
                 Fax=self.leFax.text()
@@ -548,8 +506,8 @@ class ERP_PPROV_001(QMainWindow):
 
                 if Pais=='1':
                     if len(Tipo_Prov) and len(Pais) and len(Direcc_Prov) and len(Departamento) and len(Provincia) and len(Distrito) and (len(Telf_Fijo) or len(Telf_Cel))  and len(Correo_Emp) and len(Repre_Emp) and len(DNI_Repre) and len(Correo_Repre) and len(Telf_Cel_Repre)!=0:
-                        sql ='''INSERT INTO TAB_PROV_001_Registro_de_Proveedores (Cod_prov,Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov,Usuario_Reg,Fecha_Reg,Hora_Reg)
-                        VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')'''%(Cod_Actual[0],Razon_Social,Tipo_Prov,Telf_Fijo,Correo_Emp,Direcc_Prov,Departamento,Provincia,Distrito,Pais,Telf_Cel,Fax,Anexo,RUC,Repre_Emp,DNI_Repre,Correo_Repre,Telf_Cel_Repre,Estado_Prov,Cod_Usuario,Fecha,Hora)
+                        sql ='''INSERT INTO TAB_PROV_001_Registro_de_Proveedores (Cod_prov,Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Ubigeo,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov,Usuario_Reg,Fecha_Reg,Hora_Reg)
+                        VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')'''%(Cod_Actual[0],Razon_Social,Tipo_Prov,Telf_Fijo,Correo_Emp,Direcc_Prov,Departamento,Provincia,Distrito,Pais,Ubigeo,Telf_Cel,Fax,Anexo,RUC,Repre_Emp,DNI_Repre,Correo_Repre,Telf_Cel_Repre,Estado_Prov,Cod_Usuario,Fecha,Hora)
                         respuesta=ejecutarSql(sql)
                         if respuesta['respuesta']=='correcto':
                             Cod_Actual[0]=int(Cod_Actual[0])
@@ -603,8 +561,8 @@ class ERP_PPROV_001(QMainWindow):
                         break
                 else:
                     if len(Tipo_Prov) and len(Pais) and len(Direcc_Prov) and len(Departamento) and (len(Telf_Fijo) or len(Telf_Cel))  and len(Correo_Emp) and len(Repre_Emp) and len(DNI_Repre) and len(Correo_Repre) and len(Telf_Cel_Repre)!=0:
-                        sql ='''INSERT INTO TAB_PROV_001_Registro_de_Proveedores (Cod_prov,Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov,Usuario_Reg,Fecha_Reg,Hora_Reg)
-                        VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')''' %(Cod_Actual[0],Razon_Social,Tipo_Prov,Telf_Fijo,Correo_Emp,Direcc_Prov,Departamento,Provincia,Distrito,Pais,Telf_Cel,Fax,Anexo,RUC,Repre_Emp,DNI_Repre,Correo_Repre,Telf_Cel_Repre,Estado_Prov,Cod_Usuario,Fecha,Hora)
+                        sql ='''INSERT INTO TAB_PROV_001_Registro_de_Proveedores (Cod_prov,Razón_social,Tip_Prov,Nro_Telf,Correo,Direcc_prov,Departamento,Provincia,Distrito,País,Ubigeo,Nro_Telf_Emp,Nro_Fax,Anexo,RUC_NIF,Representante,DNI_Repre,Correo_Repre,Telf_Repre,Estado_Prov,Usuario_Reg,Fecha_Reg,Hora_Reg)
+                        VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')''' %(Cod_Actual[0],Razon_Social,Tipo_Prov,Telf_Fijo,Correo_Emp,Direcc_Prov,Departamento,Provincia,Distrito,Pais,Ubigeo,Telf_Cel,Fax,Anexo,RUC,Repre_Emp,DNI_Repre,Correo_Repre,Telf_Cel_Repre,Estado_Prov,Cod_Usuario,Fecha,Hora)
                         respuesta=ejecutarSql(sql)
                         if respuesta['respuesta']=='correcto':
                             mensajeDialogo("informacion", "Información", "Registro guardado")
@@ -660,9 +618,10 @@ class ERP_PPROV_001(QMainWindow):
 
     def Habilitar(self):
 
-        Pais=self.cbPais.currentText()
+        cbPais=self.cbPais.currentText()
+        Pais=cbPais[0:cbPais.find("-")-1]
         Dep=self.cbDep.currentText()
-        if Pais=='1':
+        if Pais=='01':
             self.cbDep.setEnabled(True)
             self.cbProvincia.setEnabled(True)
             self.cbDistrito.setEnabled(True)
@@ -670,7 +629,7 @@ class ERP_PPROV_001(QMainWindow):
             self.cbDep.setEnabled(True)
 
         llenarDep(datos,self.cbDep,Pais)
-        self.cbDep.setEditText(Dep)
+        self.cbDep.setCurrentIndex(self.cbDep.findText(Dep))
 
         self.leTelf_Fijo.setReadOnly(False)
         self.leAnexo.setReadOnly(False)
@@ -698,11 +657,20 @@ class ERP_PPROV_001(QMainWindow):
             Estado_Prov=self.leEstado_Prov.text()
             Direcc_Prov=self.leDirecc_Prov.text()
             Razon_Social=self.leRazon_Social.text()
-            Pais=self.cbPais.currentText()
-            Departamento=self.cbDep.currentText()
-            Provincia=self.cbProvincia.currentText()
-            Distrito=self.cbDistrito.currentText()
-            Cod_Pos=self.leCod_Pos.text()
+
+            cbPais=self.cbPais.currentText()
+            Pais=cbPais[0:cbPais.find("-")-1]
+
+            cbDep=self.cbDep.currentText()
+            Departamento=cbDep[0:cbDep.find("-")-1]
+
+            cbProvincia=self.cbProvincia.currentText()
+            Provincia=cbProvincia[0:cbProvincia.find("-")-1]
+
+            cbDistrito=self.cbDistrito.currentText()
+            Distrito=cbDistrito[0:cbDistrito.find("-")-1]
+
+            Ubigeo=self.leUbigeo.text()
             Telf_Fijo=self.leTelf_Fijo.text()
             Anexo=self.leAnexo.text()
             Fax=self.leFax.text()
@@ -718,7 +686,7 @@ class ERP_PPROV_001(QMainWindow):
 
             Cod_Prov=self.leCod_Prov.text()
             if len(Cod_Prov)!=0:
-                sql ='''UPDATE TAB_PROV_001_Registro_de_Proveedores SET Nro_Telf='%s',Correo='%s',Direcc_prov='%s',Departamento='%s',Provincia='%s',Distrito='%s',Nro_Telf_Emp='%s',Nro_Fax='%s',Anexo='%s',Representante='%s',DNI_Repre='%s',Correo_Repre='%s',Telf_Repre='%s',Estado_Prov='%s',Usuario_Mod='%s',Fecha_Mod='%s',Hora_Mod='%s' WHERE Cod_Prov='%s';'''%(Telf_Fijo,Correo_Emp,Direcc_Prov,Departamento,Provincia,Distrito,Telf_Cel,Fax,Anexo,Repre_Emp,DNI_Repre,Correo_Repre,Telf_Cel_Repre,Estado_Prov,Cod_Usuario,Fecha,Hora,Cod_Prov)
+                sql ='''UPDATE TAB_PROV_001_Registro_de_Proveedores SET Nro_Telf='%s',Correo='%s',Direcc_prov='%s',Departamento='%s',Provincia='%s',Distrito='%s',Ubigeo='%s',Nro_Telf_Emp='%s',Nro_Fax='%s',Anexo='%s',Representante='%s',DNI_Repre='%s',Correo_Repre='%s',Telf_Repre='%s',Estado_Prov='%s',Usuario_Mod='%s',Fecha_Mod='%s',Hora_Mod='%s' WHERE Cod_Prov='%s';'''%(Telf_Fijo,Correo_Emp,Direcc_Prov,Departamento,Provincia,Distrito,Ubigeo,Telf_Cel,Fax,Anexo,Repre_Emp,DNI_Repre,Correo_Repre,Telf_Cel_Repre,Estado_Prov,Cod_Usuario,Fecha,Hora,Cod_Prov)
                 respuesta=ejecutarSql(sql)
                 if respuesta['respuesta']=='correcto':
                     self.pbGrabar.setEnabled(False)

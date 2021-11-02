@@ -757,9 +757,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;
            <string notr="true">background-color: rgb(255, 255, 255);
 font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
           </property>
-          <property name="editable">
-           <bool>true</bool>
-          </property>
           <property name="insertPolicy">
            <enum>QComboBox::InsertAtTop</enum>
           </property>
@@ -815,9 +812,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
            <string notr="true">background-color: rgb(255, 255, 255);
 font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
           </property>
-          <property name="editable">
-           <bool>true</bool>
-          </property>
           <property name="insertPolicy">
            <enum>QComboBox::InsertAtTop</enum>
           </property>
@@ -872,9 +866,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 255, 255);
 font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
-          </property>
-          <property name="editable">
-           <bool>true</bool>
           </property>
           <property name="insertPolicy">
            <enum>QComboBox::InsertAtTop</enum>
@@ -934,9 +925,6 @@ font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(255, 255, 255);
 font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
-          </property>
-          <property name="editable">
-           <bool>true</bool>
           </property>
           <property name="insertPolicy">
            <enum>QComboBox::InsertAtTop</enum>
