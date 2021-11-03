@@ -154,9 +154,9 @@ class ERP_PPROV_001(QMainWindow):
         self.leDirecc_Prov.clear()
         self.leRazon_Social.clear()
         self.cbPais.setCurrentIndex(-1)
-        self.cbDep.clearEditText()
-        self.cbProvincia.clearEditText()
-        self.cbDistrito.clearEditText()
+        self.cbDep.setCurrentIndex(-1)
+        self.cbProvincia.setCurrentIndex(-1)
+        self.cbDistrito.setCurrentIndex(-1)
         self.leUbigeo.clear()
         self.leTelf_Fijo.clear()
         self.leAnexo.clear()
@@ -726,14 +726,8 @@ class ERP_PPROV_001(QMainWindow):
         if Estado_Proveedor == "1":
             reply = mensajeDialogo("pregunta", "Pregunta","¿Realmente desea DAR BAJA al Proveedor?")
             if reply == 'Yes':
-                self.leActivo_Baja.setText("BAJA")
-                self.leActivo_Baja.setStyleSheet("color: rgb(255,0,0);\n""background-color: rgb(255,255,255);")
-                self.leEstado_Prov.clear()
-
                 Cod_Prov=self.leCod_Prov.text()
-
-                self.leEstado_Prov.setText('2')
-                Estado_Proveedor=self.leEstado_Prov.text()
+                Estado_Proveedor='2'
 
                 ModFecha=datetime.now().strftime("%Y-%m-%d")
                 ModHora=datetime.now().strftime("%H:%M:%S.%f")
@@ -745,10 +739,14 @@ class ERP_PPROV_001(QMainWindow):
                 sqlBanc ='''UPDATE TAB_PROV_007_Bancos_y_cuentas_del_Proveedor SET Estado_Banco='%s',Usuario_Mod='%s',Fecha_Mod='%s',Hora_Mod='%s' WHERE Cod_Prov='%s';'''%('2',Cod_Usuario,ModFecha,ModHora,Cod_Prov)
                 ejecutarSql(sqlBanc)
                 if respuesta['respuesta']=='correcto':
-                    mensajeDialogo("informacion", "Información", "Proveedor dado de BAJA")
+                    self.leActivo_Baja.setText("BAJA")
+                    self.leActivo_Baja.setStyleSheet("color: rgb(255,0,0);\n""background-color: rgb(255,255,255);")
+                    self.leEstado_Prov.setText(Estado_Proveedor)
                     self.pbBaja.setEnabled(False)
                     self.pbModificar.setEnabled(False)
+                    self.pbHabilitar.setEnabled(False)
                     self.pbGrabar.setEnabled(False)
+                    mensajeDialogo("informacion", "Información", "Proveedor dado de BAJA")
                 elif respuesta['respuesta']=='incorrecto':
                     mensajeDialogo("error", "Error", "No se pudo dar de BAJA")
 
