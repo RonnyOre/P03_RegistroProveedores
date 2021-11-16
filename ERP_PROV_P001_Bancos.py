@@ -235,7 +235,7 @@ class Bancos(QMainWindow):
                 for k,v in datos.items():
                     if d==v:
                         de=k[k.find("-")+1:]
-                        if de[de.find("-")+1:]=="0-0":
+                        if de[de.find("-")+1:]=="00-00":
                             Departamento=de[0:de.find("-")]
 
                 EntBan=self.tbwReg_Bancos_Cuentas_Prov.cellWidget(self.tbwReg_Bancos_Cuentas_Prov.currentRow(), 3).currentText()
