@@ -12,7 +12,7 @@ sqlCod_Banco="SELECT Descrip_Banco,Cod_Banco FROM TAB_SOC_016_Tipo_de_Bancos"
 
 sqlMoneda="SELECT Descrip_moneda,Cod_moneda FROM TAB_SOC_008_Monedas"
 
-sqlUbigeo="SELECT * FROM TAB_SOC_009_Ubigeo ORDER BY Cod_Distrito ASC, Cod_Provincia ASC, Cod_Depart_Region ASC, Cod_Pais ASC"
+sqlUbigeo="SELECT * FROM TAB_SOC_009_Ubigeo_NuevaVersion ORDER BY Cod_Distrito ASC, Cod_Provincia ASC, Cod_Depart_Region ASC, Cod_Pais ASC"
 
 class Bancos(QMainWindow):
     def __init__(self,codsoc,codusuario,Cod_Prov,Razon_Social):
@@ -66,8 +66,15 @@ class Bancos(QMainWindow):
             if codigo not in datos:
                 datos[codigo]=dato[4]
 
-        sqlBanco="SELECT Nro_Correlativo,Pais,Departamento,Entidad_Bancaria,Tipo_cuenta,Cuenta_Banco,Moneda,Cuenta_Interbanco,Estado_Banco FROM TAB_PROV_007_Bancos_y_cuentas_del_Proveedor WHERE Cod_Prov='%s'" %(Cod_Prov)
-        actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,dicbanco,banco,dicmoneda,mon)
+        sqlBanco='''SELECT a.Nro_Correlativo,b.Nombre as pais,c.Nombre as dep,d.Descrip_Banco,a.Tipo_cuenta,a.Cuenta_Banco,e.Descrip_moneda,a.Cuenta_Interbanco,a.Estado_Banco,a.Pais
+        FROM TAB_PROV_007_Bancos_y_cuentas_del_Proveedor a
+        LEFT JOIN TAB_SOC_009_Ubigeo_NuevaVersion b ON b.Cod_Pais=a.Pais AND b.Cod_Depart_Region='00' AND b.Cod_Provincia='00' AND b.Cod_Distrito='00'
+        LEFT JOIN TAB_SOC_009_Ubigeo_NuevaVersion c ON c.Cod_Pais=a.Pais AND c.Cod_Depart_Region=a.Departamento AND c.Cod_Provincia='00' AND c.Cod_Distrito='00'
+        LEFT JOIN TAB_SOC_016_Tipo_de_Bancos d ON a.Entidad_Bancaria=d.Cod_Banco
+        LEFT JOIN TAB_SOC_008_Monedas e ON a.Moneda=e.Cod_moneda
+        WHERE a.Cod_Prov='%s'
+        ORDER BY a.Nro_Correlativo ASC;'''%(Cod_Prov)
+        actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,banco,mon)
 
     def AgregarFila(self,fila,columna):
         if fila==self.tbwReg_Bancos_Cuentas_Prov.rowCount()-1:
@@ -94,7 +101,7 @@ class Bancos(QMainWindow):
             self.tbwReg_Bancos_Cuentas_Prov.setCellWidget(rowPosition, 1, cb0)
             for k,v in datos.items():
                 codigo=k.split("-")
-                if "-".join(codigo[1:])=="0-0-0":
+                if "-".join(codigo[1:])=="00-00-00":
                     cb0.addItem(v)
             cb0.setCurrentIndex(-1)
             # cb0.setStyleSheet("background-color: rgb(255,255,255);")
@@ -153,11 +160,11 @@ class Bancos(QMainWindow):
         self.tbwReg_Bancos_Cuentas_Prov.cellWidget(self.tbwReg_Bancos_Cuentas_Prov.currentRow(), 2).clear()
         for k,v in datos.items():
             codigoDep=k.split("-")
-            if v==pais and "-".join(codigoDep[1:])=="0-0-0": codigoPais=codigoDep[0]
+            if v==pais and "-".join(codigoDep[1:])=="00-00-00": codigoPais=codigoDep[0]
         for k,v in datos.items():
             codigoDep=k.split("-")
-            if "-".join(codigoDep[2:])=="0-0" and codigoPais==codigoDep[0]:
-                if "-".join(codigoDep[1:])!="0-0-0":
+            if "-".join(codigoDep[2:])=="00-00" and codigoPais==codigoDep[0]:
+                if "-".join(codigoDep[1:])!="00-00-00":
                     self.tbwReg_Bancos_Cuentas_Prov.cellWidget(self.tbwReg_Bancos_Cuentas_Prov.currentRow(), 2).addItem(v)
         self.tbwReg_Bancos_Cuentas_Prov.cellWidget(self.tbwReg_Bancos_Cuentas_Prov.currentRow(), 2).setCurrentIndex(-1)
 
@@ -177,7 +184,7 @@ class Bancos(QMainWindow):
                 for k,v in datos.items():
                     if d==v:
                         de=k[k.find("-")+1:]
-                        if de[de.find("-")+1:]=="0-0":
+                        if de[de.find("-")+1:]=="00-00":
                             Departamento=de[0:de.find("-")]
 
                 EntBan=self.tbwReg_Bancos_Cuentas_Prov.cellWidget(self.tbwReg_Bancos_Cuentas_Prov.currentRow(), 3).currentText()
@@ -213,7 +220,7 @@ class Bancos(QMainWindow):
                     self.pbModificar.setEnabled(False)
                     mensajeDialogo("error", "Error", "No se pudo grabar la información")
 
-                actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,dicbanco,banco,dicmoneda,mon)
+                actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,banco,mon)
 
         except Exception as e:
             mensajeDialogo("error", "Error", "Ningun Banco seleccionado")
@@ -274,7 +281,7 @@ class Bancos(QMainWindow):
                 else:
                     mensajeDialogo("informacion", "Información","No se pudo modificar la información")
 
-                actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,dicbanco,banco,dicmoneda,mon)
+                actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,banco,mon)
 
         except Exception as e:
             mensajeDialogo("error", "Error", "Ningun Banco seleccionado")
@@ -335,7 +342,7 @@ class Bancos(QMainWindow):
                 else:
                     mensajeDialogo("error", "Error", "Banco ya fue dado de BAJA")
 
-                actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,dicbanco,banco,dicmoneda,mon)
+                actualizarBan(self,self.tbwReg_Bancos_Cuentas_Prov,sqlBanco,datos,TCta,banco,mon)
 
             else:
                 mensajeDialogo("error", "Error", "Banco no registrado, verifique")

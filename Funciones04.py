@@ -28,6 +28,7 @@ def ejecutarSql(sql):
     return respuesta
 
 def consultarSql(sql):
+    print(sql)
     datos = {'accion':'leer','sql': sql}
     x = requests.post(url, data=datos)
     respuesta=x.json()
@@ -338,10 +339,11 @@ def actualizarInter(self,tw,sql,Tipo_Inter,dicTipoInter):
         item.setFlags(flags)
         tw.setItem(0,7, item)
 
-def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
+def actualizarBan(self,tw,sql,datos,TCta,banco,mon):
     tw.clearContents()
 
     informacion=consultarSql(sql)
+    print(informacion)
 
     if informacion!=[]:
         rows=tw.rowCount()
@@ -363,7 +365,7 @@ def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
             # cb1.setEditable(True)
             tw.setCellWidget(row, 1, cb1)
             llenarPais(datos,cb1)
-            cb1.setCurrentIndex(int(fila[1])-1)
+            cb1.setCurrentIndex(cb1.findText(fila[1]))
             # tw.cellWidget(row, 1).setEditText(fila[1])
             font = QtGui.QFont()
             font.setPointSize(12)
@@ -378,9 +380,9 @@ def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
             cb2 = QComboBox(tw)
             # cb2.setEditable(True)
             tw.setCellWidget(row, 2, cb2)
-            Paisx=fila[1]
+            Paisx=fila[9]
             llenarDepartamento(datos,cb2,Paisx)
-            cb2.setCurrentText(fila[2])
+            cb2.setCurrentIndex(cb2.findText(fila[2]))
             # tw.cellWidget(row, 2).setEditText(fila[2])
             font = QtGui.QFont()
             font.setPointSize(12)
@@ -395,7 +397,7 @@ def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
             # cb3.setEditable(True)
             tw.setCellWidget(row, 3, cb3)
             insertarDatos(cb3,banco)
-            cb3.setCurrentIndex(int(fila[3])-1)
+            cb3.setCurrentIndex(cb3.findText(fila[3]))
             # tw.cellWidget(row, 3).setEditText(fila[3])
             font = QtGui.QFont()
             font.setPointSize(12)
@@ -435,7 +437,7 @@ def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
             tw.setCellWidget(row, 6, cb6)
             insertarDatos(cb6,mon)
 
-            cb6.setCurrentIndex(int(fila[6])-1)
+            cb6.setCurrentIndex(cb6.findText(fila[6]))
             # tw.cellWidget(row, 8).setEditText(fila[6])
             font = QtGui.QFont()
             font.setPointSize(12)
@@ -477,7 +479,7 @@ def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
         tw.setCellWidget(rowPosi, 1, CB0)
         for k,v in datos.items():
             codigo=k.split("-")
-            if "-".join(codigo[1:])=="0-0-0":
+            if "-".join(codigo[1:])=="00-00-00":
                 CB0.addItem(v)
         CB0.setCurrentIndex(-1)
         # CB0.setStyleSheet("background-color: rgb(255,255,255);")
@@ -544,7 +546,7 @@ def actualizarBan(self,tw,sql,datos,TCta,dicbanco,banco,dicmoneda,mon):
         tw.setCellWidget(0, 1, cb0)
         for k,v in datos.items():
             codigo=k.split("-")
-            if "-".join(codigo[1:])=="0-0-0":
+            if "-".join(codigo[1:])=="00-00-00":
                 cb0.addItem(v)
         cb0.setCurrentIndex(-1)
         # cb0.setStyleSheet("background-color: rgb(255,255,255);")
